@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">EstacionamentoSensedia</string>
+    <string name="retirar_carro_label">Retirar</string>
+    <string name="devolver_carro_label">Devolver</string>
+    <string name="login_label">Entrar</string>
+    <string name="digite_a_placa_do_carro_label">Digite a placa do carro</string>
+    <string name="digite_o_usuario_label">Digite o usuário</string>
+    <string name="digite_a_senha_label">Digite a senha</string>
+    <string name="bem_vindo_label">Bem-vindo</string>
+    <string name="sistema_de_estacionamento_label">Sistema de estacionamento</string>
+    <string name="map_btn_send">Enviar</string>
+    <string name="id_veiculo">id_veiculo</string>
+    <string name="chapa">chapa</string>
+    <string name="id_localizacao">id_localizacao</string>
+    <string name="btn_map_finalizar">Finalizar</string>
+</resources>
