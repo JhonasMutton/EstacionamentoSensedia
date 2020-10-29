@@ -1,4 +1,4 @@
-package com.estacionamento.home
+package com.estacionamento.login
 
 import android.content.Intent
 import android.os.Build.DEVICE
@@ -14,6 +14,8 @@ import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityLoginBinding
+import com.estacionamento.home.LoginViewModel
+import com.estacionamento.home.LoginViewModelFactory
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -116,8 +118,8 @@ class LoginActivity : AppCompatActivity() {
                     LoginResponse::class.java,
                     arrayOfNulls<Annotation>(0)
                 )
-            val error: LoginResponse? = errorConverter.convert(it)
-            error?.messages?.get(0) ?: alternativeMessage
+            val errorResponse: LoginResponse? = errorConverter.convert(it)
+            errorResponse?.messages?.get(0) ?: alternativeMessage
         } ?: alternativeMessage
     }
 

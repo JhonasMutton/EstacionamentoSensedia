@@ -13,7 +13,7 @@
         >
 
         <activity
-            android:name=".home.LoginActivity"
+            android:name=".login.LoginActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,7 +34,7 @@
 
         <activity
             android:name=".map.devolucao.DevolucaoActivity"
-            android:parentActivityName=".home.LoginActivity"
+            android:parentActivityName=".login.LoginActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="com.estacionamento.map.devolucao.START" />
@@ -44,7 +44,7 @@
 
         <activity
             android:name=".map.retirada.RetiradaActivity"
-            android:parentActivityName=".home.LoginActivity"
+            android:parentActivityName=".login.LoginActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="com.estacionamento.map.retirada.START" />
