@@ -1,25 +1,27 @@
 package com.estacionamento.home
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build.DEVICE
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.estacionamento.R
+import com.estacionamento.api.carrorama.NetworkConfig
 import com.estacionamento.api.carrorama.login.Client
 import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
-import com.estacionamento.databinding.LayoutActivityHomeBinding
 import com.estacionamento.databinding.LayoutActivityLoginBinding
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.Converter
 import retrofit2.Response
-import java.io.IOException
-import java.lang.Exception
 import java.net.Inet4Address
 import java.net.NetworkInterface
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -53,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        loginClient = Client(applicationContext)
+        loginClient = Client()
     }
 
     private fun login(usuario: String, senha: String) {
@@ -71,29 +73,44 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun makeLogin(usuario: String, senha: String) {
-        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), "android", "teste", 2)
+        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), DEVICE, "app", 2)
         if (logingIn) {
             return
         }
         logingIn = true
         loginClient.Login(loginRequest).enqueue(object : Callback<LoginResponse> {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
-                binding.loginError.text = "Ocorreu um erro interno na autenticação!"
+                binding.loginError.text = "Ocorreu um erro interno durante a autenticação!"
                 logingIn = false
             }
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 Log.e("login", "Autenticação feita e com código:" + response.code())
-                Log.e("login", "Autenticação feita e com código:" +  response.body().toString())
                 when {
                     response.isSuccessful -> startActivity(getHomeIntent()) //TODO colocar body no session manager
-                    response.code() == 401 -> binding.loginError.text = "Usuário ou senha errados!"//TODO ADICIONAR AO DICIONARIO
-                    else -> binding.loginError.text = "Ocorreu alfgum erro na autenticação!"
+                    response.code() == 401 -> binding.loginError.text =
+                        extractMessageError(response, "Usuário ou senha incorretos!")
+                    else -> binding.loginError.text =
+                        extractMessageError(response, "Ocorreu algum erro na autenticação!")
                 }
                 logingIn = false
             }
         })
 
+    }
 
+    private fun extractMessageError(
+        response: Response<LoginResponse>,
+        alternativeMessage: String
+    ): String {
+        return response.errorBody()?.let {
+            val errorConverter: Converter<ResponseBody, LoginResponse> =
+                NetworkConfig.getRetrofitInstance().responseBodyConverter(
+                    LoginResponse::class.java,
+                    arrayOfNulls<Annotation>(0)
+                )
+            val error: LoginResponse? = errorConverter.convert(it)
+            error?.messages?.get(0) ?: alternativeMessage
+        } ?: alternativeMessage
     }
 
     fun getIpv4HostAddress(): String {
