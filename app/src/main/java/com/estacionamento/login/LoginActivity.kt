@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.estacionamento.R
 import com.estacionamento.api.carrorama.NetworkConfig
-import com.estacionamento.api.carrorama.login.Client
+import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityLoginBinding
@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: LayoutActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
     private lateinit var viewModelFactory: LoginViewModelFactory
-    private lateinit var loginClient: Client
+    private lateinit var loginClient: LoginClient
     private var loggingIn: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        loginClient = Client()
+        loginClient = LoginClient()
     }
 
     private fun login(usuario: String, senha: String) {
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
         }
         loggingIn = true
         DisableLoginButton(loggingIn)
-        loginClient.Login(loginRequest).enqueue(object : Callback<LoginResponse> {
+        loginClient.login(loginRequest).enqueue(object : Callback<LoginResponse> {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
                 binding.loginError.text = "Ocorreu um erro interno durante a autenticação!"
                 loggingIn = false
