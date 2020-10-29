@@ -5,11 +5,11 @@ import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
 import retrofit2.Call
 
-class Client {
+class LoginClient {
 
-    private var routes: Routes = NetworkConfig
-        .provideApi(Routes::class.java)
+    private var loginRoutes: LoginRoutes = NetworkConfig
+        .provideApi(LoginRoutes::class.java)
 
-    public fun Login(loginRequest: LoginRequest): Call<LoginResponse> = routes.Login(loginRequest)
+    fun login(loginRequest: LoginRequest): Call<LoginResponse> = loginRoutes.Login(loginRequest)
 
 }

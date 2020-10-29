@@ -6,7 +6,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface Routes {
+interface LoginRoutes {
     @POST("acesso/login")
     fun Login(@Body loginRequest: LoginRequest) : Call<LoginResponse>
 }
