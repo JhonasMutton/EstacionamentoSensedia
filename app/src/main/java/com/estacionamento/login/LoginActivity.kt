@@ -80,12 +80,12 @@ class LoginActivity : AppCompatActivity() {
             return
         }
         loggingIn = true
-        DisableLoginButton(loggingIn)
+        disableLoginButton(loggingIn)
         loginClient.login(loginRequest).enqueue(object : Callback<LoginResponse> {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
                 binding.loginError.text = "Ocorreu um erro interno durante a autenticação!"
                 loggingIn = false
-                DisableLoginButton(loggingIn)
+                disableLoginButton(loggingIn)
             }
 
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
@@ -98,13 +98,13 @@ class LoginActivity : AppCompatActivity() {
                         extractMessageError(response, "Ocorreu algum erro durante a autenticação!")
                 }
                 loggingIn = false
-                DisableLoginButton(loggingIn)
+                disableLoginButton(loggingIn)
             }
         })
 
     }
 
-    private fun DisableLoginButton(isDisable: Boolean) {
+    private fun disableLoginButton(isDisable: Boolean) {
         binding.buttonDevolverCarro.isEnabled = !isDisable
     }
 
