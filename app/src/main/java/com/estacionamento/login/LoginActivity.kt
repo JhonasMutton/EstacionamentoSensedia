@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var viewModelFactory: LoginViewModelFactory
     private lateinit var loginClient: Client
-    private var logingIn: Boolean = false
+    private var loggingIn: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -62,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
         when {
             usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
             senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
-            else -> makeLogin(usuario, senha)
+            else -> doLogin(usuario, senha)
         }
     }
 
@@ -72,17 +72,20 @@ class LoginActivity : AppCompatActivity() {
         private const val HOME_INTENT = "com.estacionamento.home.START"
     }
 
-    private fun makeLogin(usuario: String, senha: String) {
+    private fun doLogin(usuario: String, senha: String) {
         val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), DEVICE, "app", 2)
-        if (logingIn) {
+        if (loggingIn) {
             return
         }
-        logingIn = true
+        loggingIn = true
+        DisableLoginButton(loggingIn)
         loginClient.Login(loginRequest).enqueue(object : Callback<LoginResponse> {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
                 binding.loginError.text = "Ocorreu um erro interno durante a autenticação!"
-                logingIn = false
+                loggingIn = false
+                DisableLoginButton(loggingIn)
             }
+
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 Log.e("login", "Autenticação feita e com código:" + response.code())
                 when {
@@ -90,12 +93,17 @@ class LoginActivity : AppCompatActivity() {
                     response.code() == 401 -> binding.loginError.text =
                         extractMessageError(response, "Usuário ou senha incorretos!")
                     else -> binding.loginError.text =
-                        extractMessageError(response, "Ocorreu algum erro na autenticação!")
+                        extractMessageError(response, "Ocorreu algum erro durante a autenticação!")
                 }
-                logingIn = false
+                loggingIn = false
+                DisableLoginButton(loggingIn)
             }
         })
 
+    }
+
+    private fun DisableLoginButton(isDisable: Boolean) {
+        binding.buttonDevolverCarro.isEnabled = !isDisable
     }
 
     private fun extractMessageError(
@@ -113,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
         } ?: alternativeMessage
     }
 
-    fun getIpv4HostAddress(): String {
+    private fun getIpv4HostAddress(): String {
         NetworkInterface.getNetworkInterfaces()?.toList()?.map { networkInterface ->
             networkInterface.inetAddresses?.toList()?.find {
                 !it.isLoopbackAddress && it is Inet4Address
