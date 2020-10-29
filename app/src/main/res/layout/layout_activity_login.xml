@@ -32,126 +32,125 @@
             android:elevation="2dp"
             >
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="500dp"
-            android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_gravity="bottom"
-            android:background="@color/white"
-            >
-
-            <TextView
-                android:id="@+id/labelBemVindo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="@string/bem_vindo_label"
-                android:textColor="#4a2564"
-                android:textSize="38sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="10dp"
-                />
-
-            <TextView
-                android:id="@+id/labelSistemaEstacionamento"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sistema_de_estacionamento_label"
-                android:textSize="15sp"
-                android:fontFamily="@font/montserrat"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/labelBemVindo"
-                android:layout_marginTop="5dp"
-                />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/input_senha"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat"
-            android:inputType="textPassword"
-            android:focusedByDefault="false"
-            android:hint="@string/digite_a_senha_label"
-            app:errorEnabled="true"
-            android:layout_marginTop="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_usuario_carro"
-            >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_senha_interno"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLength="7"
-                android:singleLine="true"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="500dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
                 android:background="@color/white"
-                android:inputType="textPassword"
-                />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_usuario_carro"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:inputType="text"
-                android:focusedByDefault="false"
-                android:hint="@string/digite_o_usuario_label"
-                app:errorEnabled="true"
-                android:layout_marginTop="20dp"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/labelSistemaEstacionamento"
-                >
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_usuario_interno"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/labelBemVindo"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLength="7"
-                    android:singleLine="true"
-                    android:background="@color/white"
-                    />
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/montserrat"
+                    android:text="@string/bem_vindo_label"
+                    android:textColor="#4a2564"
+                    android:textSize="38sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    android:id="@+id/labelSistemaEstacionamento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/montserrat"
+                    android:text="@string/sistema_de_estacionamento_label"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/labelBemVindo" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/input_senha"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="30dp"
-            >
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_senha"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:focusedByDefault="false"
+                    android:fontFamily="@font/montserrat"
+                    android:hint="@string/digite_a_senha_label"
+                    android:inputType="textPassword"
+                    app:errorEnabled="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_usuario_carro">
+
+                    <TextView
+                        android:id="@+id/login_error"
+                        android:layout_width="175dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/design_default_color_error"
+                        tools:text="@tools:sample/lorem"
+                        />
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_senha_interno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:inputType="textPassword"
+                        android:maxLength="7"
+                        android:singleLine="true" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_usuario_carro"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:focusedByDefault="false"
+                    android:fontFamily="@font/montserrat"
+                    android:hint="@string/digite_o_usuario_label"
+                    android:inputType="text"
+                    app:errorEnabled="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/labelSistemaEstacionamento">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_usuario_interno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:maxLength="7"
+                        android:singleLine="true" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/input_senha">
 
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button_Devolver_Carro"
-                android:layout_width="120dp"
-                android:layout_height="52dp"
-                android:backgroundTint="#4a2564"
-                android:text="@string/login_label"
-                android:textColor="#FFFFFF"
-                android:fontFamily="@font/montserrat"
-                app:layout_constraintStart_toEndOf="@+id/button_Retirar_Carro"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginStart="40dp"
-                android:elevation="2dp"
-                android:background="@drawable/round_corner"
-                />
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/button_Devolver_Carro"
+                        android:layout_width="120dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="40dp"
+                        android:background="@drawable/round_corner"
+                        android:backgroundTint="#4a2564"
+                        android:elevation="2dp"
+                        android:fontFamily="@font/montserrat"
+                        android:text="@string/login_label"
+                        android:textColor="#FFFFFF"
+                        app:layout_constraintStart_toEndOf="@+id/button_Retirar_Carro"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.cardview.widget.CardView>
 

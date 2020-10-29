@@ -16,6 +16,7 @@ import com.estacionamento.databinding.LayoutActivityLoginBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.lang.Exception
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -26,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var viewModelFactory: LoginViewModelFactory
     private lateinit var loginClient: Client
+    private var logingIn: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -43,6 +45,7 @@ class LoginActivity : AppCompatActivity() {
             binding.inputSenhaInterno.text.toString()
         })
 
+
         binding.buttonDevolverCarro.setOnClickListener {
             login(
                 binding.inputUsuarioInterno.text.toString().toUpperCase(),
@@ -54,35 +57,43 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun login(usuario: String, senha: String) {
-        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), "android", "teste", 2)
-
-        loginClient.run {
-            Login(loginRequest).enqueue(object : Callback<LoginResponse> {
-                override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
-                    Log.e("top", "DEUS BOSTA MENÓ"+ t.message)
-                    binding.inputUsuarioInterno.error = "DEUS BOSTA MENÓ"
-                }
-
-                override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                    Log.e("BOOM","DEUS BOM PRA CARALHO MAIÓ"+ response.message())
-                    binding.inputUsuarioInterno.error = "DEUS BOM PRA CARALHO MAIÓ"
-                }
-            })
+        when {
+            usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
+            senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
+            else -> makeLogin(usuario, senha)
         }
-
-
-//        when {
-//            usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
-//            senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
-//            else -> startActivity(getHomeIntent())
-//        }
     }
 
     private fun getHomeIntent() = Intent(HOME_INTENT)
 
-
     companion object {
         private const val HOME_INTENT = "com.estacionamento.home.START"
+    }
+
+    private fun makeLogin(usuario: String, senha: String) {
+        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), "android", "teste", 2)
+        if (logingIn) {
+            return
+        }
+        logingIn = true
+        loginClient.Login(loginRequest).enqueue(object : Callback<LoginResponse> {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
+                binding.loginError.text = "Ocorreu um erro interno na autenticação!"
+                logingIn = false
+            }
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                Log.e("login", "Autenticação feita e com código:" + response.code())
+                Log.e("login", "Autenticação feita e com código:" +  response.body().toString())
+                when {
+                    response.isSuccessful -> startActivity(getHomeIntent()) //TODO colocar body no session manager
+                    response.code() == 401 -> binding.loginError.text = "Usuário ou senha errados!"//TODO ADICIONAR AO DICIONARIO
+                    else -> binding.loginError.text = "Ocorreu alfgum erro na autenticação!"
+                }
+                logingIn = false
+            }
+        })
+
+
     }
 
     fun getIpv4HostAddress(): String {
