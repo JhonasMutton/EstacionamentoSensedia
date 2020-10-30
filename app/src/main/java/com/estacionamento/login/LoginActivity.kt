@@ -36,6 +36,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private var loggingIn: Boolean = false
 
+    companion object {
+        private const val HOME_INTENT = "com.estacionamento.home.START"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -64,21 +68,15 @@ class LoginActivity : AppCompatActivity() {
         sessionManager = SessionManager(applicationContext)
     }
 
-    private fun login(usuario: String, senha: String) {
-        when {
-            usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
-            !EMAIL_ADDRESS.matcher(usuario).matches() ->
-                binding.inputUsuarioInterno.error = "Endereço de email de formato errado!"
-            senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
-            else -> doLogin(usuario, senha)
-        }
+    private fun login(usuario: String, senha: String) = when {
+        usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
+        !EMAIL_ADDRESS.matcher(usuario).matches() ->
+            binding.inputUsuarioInterno.error = "Endereço de email de formato errado!"
+        senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
+        else -> doLogin(usuario, senha)
     }
 
     private fun getHomeIntent() = Intent(HOME_INTENT)
-
-    companion object {
-        private const val HOME_INTENT = "com.estacionamento.home.START"
-    }
 
     private fun doLogin(usuario: String, senha: String) {
         val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), MODEL, "web", 2)
