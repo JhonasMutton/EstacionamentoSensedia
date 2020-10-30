@@ -84,11 +84,10 @@
 
                     <TextView
                         android:id="@+id/login_error"
-                        android:layout_width="175dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/design_default_color_error"
-                        tools:text="@tools:sample/lorem"
-                        />
+                        tools:text="@tools:sample/lorem" />
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/input_senha_interno"
@@ -96,7 +95,6 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:inputType="textPassword"
-                        android:maxLength="7"
                         android:singleLine="true" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -109,7 +107,7 @@
                     android:focusedByDefault="false"
                     android:fontFamily="@font/montserrat"
                     android:hint="@string/digite_o_usuario_label"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
                     app:errorEnabled="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -120,7 +118,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:maxLength="7"
                         android:singleLine="true" />
 
                 </com.google.android.material.textfield.TextInputLayout>

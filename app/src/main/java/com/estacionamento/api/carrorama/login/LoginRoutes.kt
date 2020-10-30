@@ -8,5 +8,5 @@ import retrofit2.http.POST
 
 interface LoginRoutes {
     @POST("acesso/login")
-    fun Login(@Body loginRequest: LoginRequest) : Call<LoginResponse>
+    fun login(@Body loginRequest: LoginRequest) : Call<LoginResponse>
 }

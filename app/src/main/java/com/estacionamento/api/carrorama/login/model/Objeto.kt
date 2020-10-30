@@ -14,7 +14,7 @@ data class Objeto (
 	@SerializedName("fcmToken") val fcmToken : String,
 	@SerializedName("deviceIdentifier") val deviceIdentifier : String,
 	@SerializedName("nome") val nome : String,
-	@SerializedName("cnpj") val cnpj : Int,
+	@SerializedName("cnpj") val cnpj : Long,
 	@SerializedName("grupoPermissao") val grupoPermissao : String,
 	@SerializedName("modulos") val modulos : List<String>,
 	@SerializedName("tutoriais") val tutoriais : List<Tutoriais>,

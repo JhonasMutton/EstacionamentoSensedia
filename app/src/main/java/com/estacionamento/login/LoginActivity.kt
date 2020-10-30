@@ -52,8 +52,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding.buttonDevolverCarro.setOnClickListener {
             login(
-                binding.inputUsuarioInterno.text.toString().toUpperCase(),
-                binding.inputSenhaInterno.text.toString().toUpperCase()
+                binding.inputUsuarioInterno.text.toString(),
+                binding.inputSenhaInterno.text.toString()
             )
         }
 
@@ -75,7 +75,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun doLogin(usuario: String, senha: String) {
-        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), DEVICE, "app", 2)
+        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), "Android", "web", 2)
+        Log.i("login", loginRequest.toString())
         if (loggingIn) {
             return
         }

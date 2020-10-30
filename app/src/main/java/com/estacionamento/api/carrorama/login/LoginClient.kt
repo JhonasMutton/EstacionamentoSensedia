@@ -10,6 +10,6 @@ class LoginClient {
     private var loginRoutes: LoginRoutes = NetworkConfig
         .provideApi(LoginRoutes::class.java)
 
-    fun login(loginRequest: LoginRequest): Call<LoginResponse> = loginRoutes.Login(loginRequest)
+    fun login(loginRequest: LoginRequest): Call<LoginResponse> = loginRoutes.login(loginRequest)
 
 }

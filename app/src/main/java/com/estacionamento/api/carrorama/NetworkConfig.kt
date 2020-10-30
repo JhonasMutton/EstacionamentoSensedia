@@ -8,16 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-//class Config {
-//    companion object {
-//        fun getRetrofitInstance(path : String) : Retrofit {
-//            return Retrofit.Builder()
-//                .baseUrl(path)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build()
-//        }
-//    }
-//}
 object NetworkConfig {
     lateinit var context: Context
     private const val BASE_URL = "https://starterapi.staging.g2fleet.com/carroramafleet/ws/"
