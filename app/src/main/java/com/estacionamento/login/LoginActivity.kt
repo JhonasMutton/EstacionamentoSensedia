@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build.MODEL
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns.EMAIL_ADDRESS
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -34,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginClient: LoginClient
     private lateinit var sessionManager: SessionManager
     private var loggingIn: Boolean = false
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -66,6 +67,8 @@ class LoginActivity : AppCompatActivity() {
     private fun login(usuario: String, senha: String) {
         when {
             usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
+            !EMAIL_ADDRESS.matcher(usuario).matches() ->
+                binding.inputUsuarioInterno.error = "Endereço de email de formato errado!"
             senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
             else -> doLogin(usuario, senha)
         }
