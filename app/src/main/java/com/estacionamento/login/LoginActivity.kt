@@ -1,7 +1,7 @@
 package com.estacionamento.login
 
 import android.content.Intent
-import android.os.Build.DEVICE
+import android.os.Build.MODEL
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +16,7 @@ import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityLoginBinding
 import com.estacionamento.home.LoginViewModel
 import com.estacionamento.home.LoginViewModelFactory
+import com.estacionamento.session.SessionManager
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,7 +32,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var viewModelFactory: LoginViewModelFactory
     private lateinit var loginClient: LoginClient
+    private lateinit var sessionManager: SessionManager
     private var loggingIn: Boolean = false
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -49,7 +52,6 @@ class LoginActivity : AppCompatActivity() {
             binding.inputSenhaInterno.text.toString()
         })
 
-
         binding.buttonDevolverCarro.setOnClickListener {
             login(
                 binding.inputUsuarioInterno.text.toString(),
@@ -58,6 +60,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginClient = LoginClient()
+        sessionManager = SessionManager(applicationContext)
     }
 
     private fun login(usuario: String, senha: String) {
@@ -75,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun doLogin(usuario: String, senha: String) {
-        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), "Android", "web", 2)
+        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), MODEL, "web", 2)
         Log.i("login", loginRequest.toString())
         if (loggingIn) {
             return
@@ -90,9 +93,14 @@ class LoginActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                Log.e("login", "Autenticação feita e com código:" + response.code())
+                Log.e("login", "Autenticação feita e com código: " + response.code())
                 when {
-                    response.isSuccessful -> startActivity(getHomeIntent()) //TODO colocar body no session manager
+                    response.isSuccessful -> response.body()?.let {
+                        sessionManager.startSession(it)
+                        startActivity(getHomeIntent())
+                    } ?: let {
+                        binding.loginError.text = "Ocorreu algum erro durante a autenticação!"
+                    }
                     response.code() == 401 -> binding.loginError.text =
                         extractMessageError(response, "Usuário ou senha incorretos!")
                     else -> binding.loginError.text =
