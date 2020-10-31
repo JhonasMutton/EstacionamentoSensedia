@@ -15,8 +15,7 @@ import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityLoginBinding
-import com.estacionamento.home.LoginViewModel
-import com.estacionamento.home.LoginViewModelFactory
+import com.estacionamento.home.HomeViewModel
 import com.estacionamento.session.SessionManager
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -30,8 +29,6 @@ import java.net.NetworkInterface
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: LayoutActivityLoginBinding
-    private lateinit var viewModel: LoginViewModel
-    private lateinit var viewModelFactory: LoginViewModelFactory
     private lateinit var loginClient: LoginClient
     private lateinit var sessionManager: SessionManager
     private var loggingIn: Boolean = false
@@ -46,22 +43,18 @@ class LoginActivity : AppCompatActivity() {
             this,
             R.layout.layout_activity_login
         )
-        viewModelFactory = LoginViewModelFactory(applicationContext)
-        viewModel =
-            ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 
-        viewModel.homeLiveData.observe(this, Observer {
-            binding.inputUsuarioInterno.text.toString()
-        })
-        viewModel.homeLiveData.observe(this, Observer {
-            binding.inputSenhaInterno.text.toString()
-        })
 
         binding.buttonDevolverCarro.setOnClickListener {
             login(
                 binding.inputUsuarioInterno.text.toString(),
                 binding.inputSenhaInterno.text.toString()
             )
+        }
+
+        binding.esqueceuSenha.setOnClickListener{
+            startActivity(Intent("com.login.forgotpassword.START"))
+            finish()
         }
 
         loginClient = LoginClient()

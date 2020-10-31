@@ -17,9 +17,9 @@ class HomeViewModel(
 
     val homeLiveData: MutableLiveData<String> = MutableLiveData()
 
-    private val _liveData: MutableLiveData<LoginViewState> = MutableLiveData()
+    private val _liveData: MutableLiveData<HomeViewState> = MutableLiveData()
 
-    val liveData: LiveData<LoginViewState>
+    val liveData: LiveData<HomeViewState>
         get() = _liveData
 
     private var carId = -1
@@ -79,7 +79,7 @@ class HomeViewModel(
     }
 
     fun sendCar() {
-        _liveData.value = LoginViewState.LoadingCarInfo
+        _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
                 carId = veiculoDao.getVeiculo(chapa)
@@ -89,19 +89,19 @@ class HomeViewModel(
                     if(validateLocation())
                     {
                         veiculoLocalizacao = veiculoLocalizacaoDao.getVeiculoLocalizacao(carId,carLocation)
-                        _liveData.postValue(LoginViewState.CarInfoLoadedRetirada)
+                        _liveData.postValue(HomeViewState.CarInfoLoadedRetirada)
                     }
                 }
             }
         }
         catch (e: Exception)
         {
-            _liveData.value = LoginViewState.Error(e)
+            _liveData.value = HomeViewState.Error(e)
         }
     }
 
     fun sendCarDevolucao() {
-        _liveData.value = LoginViewState.LoadingCarInfo
+        _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
                 carId = veiculoDao.getVeiculo(chapa)
@@ -110,21 +110,21 @@ class HomeViewModel(
                     carLocation = veiculoLocalizacaoDao.veiculoDisponivel(carId)
                     if(validateLocationDevolucao())
                     {
-                        _liveData.postValue(LoginViewState.CarInfoLoadedDevolucao)
+                        _liveData.postValue(HomeViewState.CarInfoLoadedDevolucao)
                     }
                 }
             }
         }
         catch (e: Exception)
         {
-            _liveData.value = LoginViewState.Error(e)
+            _liveData.value = HomeViewState.Error(e)
         }
     }
 
     private suspend fun validateCar(): Boolean{
         if(carId == 0){
             val exception = Exception("carroInvalido")
-            _liveData.postValue(LoginViewState.Error(exception))
+            _liveData.postValue(HomeViewState.Error(exception))
             return false
         }
         return true
@@ -133,7 +133,7 @@ class HomeViewModel(
     private suspend fun validateLocation(): Boolean{
         if(carLocation == 0){
             val exception = Exception("carroRetirado")
-            _liveData.postValue(LoginViewState.Error(exception))
+            _liveData.postValue(HomeViewState.Error(exception))
             return false
         }
         return true
@@ -143,7 +143,7 @@ class HomeViewModel(
     private suspend fun validateLocationDevolucao(): Boolean{
         if(carLocation != 0){
             val exception = Exception("carroDevolvido")
-            _liveData.postValue(LoginViewState.Error(exception))
+            _liveData.postValue(HomeViewState.Error(exception))
             return false
         }
         return true
@@ -151,6 +151,6 @@ class HomeViewModel(
 
     fun showPlacaInvalidaError(){
         val exception = Exception("placaInvalida")
-        _liveData.value  = LoginViewState.Error(exception)
+        _liveData.value  = HomeViewState.Error(exception)
     }
 }

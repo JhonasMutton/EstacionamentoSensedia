@@ -14,17 +14,17 @@ import java.lang.Exception
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: LayoutActivityHomeBinding
-    private lateinit var viewModel: LoginViewModel
-    private lateinit var viewModelFactory: LoginViewModelFactory
+    private lateinit var viewModel: HomeViewModel
+    private lateinit var viewModelFactory: HomeViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,
             R.layout.layout_activity_home
         )
-        viewModelFactory = LoginViewModelFactory(applicationContext)
+        viewModelFactory = HomeViewModelFactory(applicationContext)
         viewModel =
-            ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
 
         viewModel.homeLiveData.observe(this, Observer {
             binding.inputPlacaCarroInterno.text.toString()
@@ -39,10 +39,10 @@ class HomeActivity : AppCompatActivity() {
         viewModel.startDb()
         viewModel.liveData.observe(this, Observer { viewState ->
             when (viewState) {
-                LoginViewState.LoadingCarInfo -> showLoadingView()
-                is LoginViewState.CarInfoLoadedDevolucao -> sendCarDevolucao()
-                is LoginViewState.CarInfoLoadedRetirada -> sendCarRetirada()
-                is LoginViewState.Error -> showErrorView(viewState.exception)
+                HomeViewState.LoadingCarInfo -> showLoadingView()
+                is HomeViewState.CarInfoLoadedDevolucao -> sendCarDevolucao()
+                is HomeViewState.CarInfoLoadedRetirada -> sendCarRetirada()
+                is HomeViewState.Error -> showErrorView(viewState.exception)
             }
         })
     }
