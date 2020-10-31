@@ -1,25 +1,28 @@
 package com.estacionamento.login
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.estacionamento.R
+import com.estacionamento.api.carrorama.NetworkConfig
 import com.estacionamento.api.carrorama.login.LoginClient
+import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityForgotPasswordBinding
-import com.estacionamento.session.SessionManager
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Converter
+import retrofit2.Response
 
 
 class ForgotPasswordActivity : AppCompatActivity() {
-
     private lateinit var binding: LayoutActivityForgotPasswordBinding
     private lateinit var loginClient: LoginClient
-    private lateinit var sessionManager: SessionManager
-    private var loggingIn: Boolean = false
-
-    companion object {
-        private const val LOGIN_INTENT = "com.login.START"
-    }
+    private var sendingRecovery: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,91 +32,79 @@ class ForgotPasswordActivity : AppCompatActivity() {
         )
 
         binding.buttonVoltar.setOnClickListener {
-//            startActivity(getLoginIntent())
             val openMainActivity = Intent(this, LoginActivity::class.java)
             openMainActivity.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             startActivity(openMainActivity)
+            finish()
         }
 
         binding.buttonEnviarEmail.setOnClickListener {
-            binding.inputUsuarioInterno.error = "Porra jamelão"
+            val email = binding.inputEmail.text.toString()
+            when {
+                email == "" -> binding.inputEmail.error = "Preencha com seu email!"
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                    binding.inputEmail.error = "Endereço de email de formato errado!"
+                else -> enviarRecuperacao(email)
+            }
         }
 
-//        loginClient = LoginClient()
-//        sessionManager = SessionManager(applicationContext)
+        loginClient = LoginClient()
     }
 
-//    private fun login(usuario: String, senha: String) = when {
-//        usuario == "" -> binding.inputUsuarioInterno.error = "Preencha o campo de usuario"
-//        !EMAIL_ADDRESS.matcher(usuario).matches() ->
-//            binding.inputUsuarioInterno.error = "Endereço de email de formato errado!"
-////        senha == "" -> binding.inputSenhaInterno.error = "Preencha o campo de senha"
-//        else -> doLogin(usuario, senha)
-//    }
+    fun enviarRecuperacao(email: String) {
+        if (sendingRecovery) {
+            return
+        }
+        sendingRecovery = true
+        disableButton(sendingRecovery)
+        loginClient.forgotPassword(email).enqueue(object : Callback<LoginResponse> {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
+                binding.message.text = "Ocorreu um erro interno!"
+                sendingRecovery = false
+                disableButton(sendingRecovery)
+            }
 
-    private fun getLoginIntent() = Intent(LOGIN_INTENT)
-
-    private fun doLogin(usuario: String, senha: String) {
-//        val loginRequest = LoginRequest(usuario, senha, getIpv4HostAddress(), MODEL, "web", 2)
-//        Log.i("login", loginRequest.toString())
-//        if (loggingIn) {
-//            return
-//        }
-//        loggingIn = true
-//        disableLoginButton(loggingIn)
-//        loginClient.login(loginRequest).enqueue(object : Callback<LoginResponse> {
-//            override fun onFailure(call: Call<LoginResponse>, t: Throwable): Unit {
-////                binding.loginError.text = "Ocorreu um erro interno durante a autenticação!"
-//                loggingIn = false
-//                disableLoginButton(loggingIn)
-//            }
-//
-//            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-//                Log.e("login", "Autenticação feita e com código: " + response.code())
-//                when {
-//                    response.isSuccessful -> response.body()?.let {
-//                        sessionManager.startSession(it)
-//                        startActivity(getHomeIntent())
-//                    } ?: let {
-////                        binding.loginError.text = "Ocorreu algum erro durante a autenticação!"
-//                    }
-////                    response.code() == 401 -> binding.loginError.text =
-////                        extractMessageError(response, "Usuário ou senha incorretos!")
-////                    else -> binding.loginError.text =
-////                        extractMessageError(response, "Ocorreu algum erro durante a autenticação!")
-//                }
-//                loggingIn = false
-//                disableLoginButton(loggingIn)
-//            }
-//        })
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                Log.e("login", "Autenticação feita e com código: " + response.code())
+                when {
+                    response.isSuccessful -> run {
+                        binding.message.text = "Verifique seu email e siga as instruções!"
+                        binding.message.setTextColor(Color.GRAY)
+                    }
+                    response.code() == 403 -> run {
+                        binding.message.text = "Usuário não cadastrado!"
+                        binding.message.setTextColor(Color.RED)
+                    }
+                    else -> run {
+                        Log.e("w", "code" + response.code())
+                        binding.message.text = extractMessageError(response)
+                        binding.message.setTextColor(Color.RED)
+                    }
+                }
+                sendingRecovery = false
+                disableButton(sendingRecovery)
+            }
+        })
 
     }
 
-//    private fun disableLoginButton(isDisable: Boolean) {
-//        binding.buttonDevolverCarro.isEnabled = !isDisable
-//    }
-//
-//    private fun extractMessageError(
-//        response: Response<LoginResponse>,
-//        alternativeMessage: String
-//    ): String {
-//        return response.errorBody()?.let {
-//            val errorConverter: Converter<ResponseBody, LoginResponse> =
-//                NetworkConfig.getRetrofitInstance().responseBodyConverter(
-//                    LoginResponse::class.java,
-//                    arrayOfNulls<Annotation>(0)
-//                )
-//            val errorResponse: LoginResponse? = errorConverter.convert(it)
-//            errorResponse?.messages?.get(0) ?: alternativeMessage
-//        } ?: alternativeMessage
-//    }
-//
-//    private fun getIpv4HostAddress(): String {
-//        NetworkInterface.getNetworkInterfaces()?.toList()?.map { networkInterface ->
-//            networkInterface.inetAddresses?.toList()?.find {
-//                !it.isLoopbackAddress && it is Inet4Address
-//            }?.let { return it.hostAddress }
-//        }
-//        return ""
-//    }
+    private fun disableButton(isDisable: Boolean) {
+        binding.buttonEnviarEmail.isEnabled = !isDisable
+    }
+
+    private fun extractMessageError(
+        response: Response<LoginResponse>
+    ): String {
+        val alternativeMessage: String = "Ocorreu algum erro, tente novamente!"
+        return response.errorBody()?.let {
+            val errorConverter: Converter<ResponseBody, LoginResponse> =
+                NetworkConfig.getRetrofitInstance().responseBodyConverter(
+                    LoginResponse::class.java,
+                    arrayOfNulls<Annotation>(0)
+                )
+            val errorResponse: LoginResponse? = errorConverter.convert(it)
+            errorResponse?.messages?.get(0) ?: alternativeMessage
+        } ?: alternativeMessage
+    }
+
 }

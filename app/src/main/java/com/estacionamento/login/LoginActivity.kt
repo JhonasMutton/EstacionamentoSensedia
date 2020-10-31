@@ -7,15 +7,12 @@ import android.util.Log
 import android.util.Patterns.EMAIL_ADDRESS
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.estacionamento.R
 import com.estacionamento.api.carrorama.NetworkConfig
 import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.api.carrorama.login.model.LoginRequest
 import com.estacionamento.api.carrorama.login.model.LoginResponse
 import com.estacionamento.databinding.LayoutActivityLoginBinding
-import com.estacionamento.home.HomeViewModel
 import com.estacionamento.session.SessionManager
 import okhttp3.ResponseBody
 import retrofit2.Call
