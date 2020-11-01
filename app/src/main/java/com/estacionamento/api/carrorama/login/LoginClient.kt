@@ -12,4 +12,5 @@ class LoginClient {
 
     fun login(loginRequest: LoginRequest): Call<LoginResponse> = loginRoutes.login(loginRequest)
 
+    fun forgotPassword(email: String): Call<LoginResponse> = loginRoutes.forgotPassword(email)
 }
