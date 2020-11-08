@@ -1,13 +1,24 @@
 package com.estacionamento.home
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import com.estacionamento.api.carrorama.login.LoginClient
+import com.estacionamento.api.carrorama.login.model.LoginResponse
+import com.estacionamento.api.carrorama.vehicle.VehicleClient
+import com.estacionamento.api.carrorama.vehicle.VehicleObject
+import com.estacionamento.api.carrorama.vehicle.VehicleResponse
 import com.estacionamento.database.*
+import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 
 
@@ -16,18 +27,15 @@ class HomeViewModel(
 ) : ViewModel() {
 
     val homeLiveData: MutableLiveData<String> = MutableLiveData()
-
     private val _liveData: MutableLiveData<HomeViewState> = MutableLiveData()
+    private val vehicleClient: VehicleClient = VehicleClient()
+    private val sessionManager: SessionManager = SessionManager(context)
 
     val liveData: LiveData<HomeViewState>
         get() = _liveData
-
     private var carId = -1
-
     private var carLocation = -1
-
     private var veiculoLocalizacao = -1
-
     private lateinit var chapa: String
 
     private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
@@ -82,9 +90,16 @@ class HomeViewModel(
         _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
-                carId = veiculoDao.getVeiculo(chapa)
+                val vehicleObject = getVehicle()
+                vehicleObject ?: run {
+                    _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroInvalido")))
+                    return@launch
+                }
+
+              carId = vehicleObject.id
                 if(validateCar()){
                     Log.d("debug", "getCarId: carId - $carId")
+                    //TODO Verificar disponibilidade via API
                     carLocation = veiculoLocalizacaoDao.veiculoDisponivel(carId)
                     if(validateLocation())
                     {
@@ -152,5 +167,14 @@ class HomeViewModel(
     fun showPlacaInvalidaError(){
         val exception = Exception("placaInvalida")
         _liveData.value  = HomeViewState.Error(exception)
+    }
+
+    private fun getVehicle(): VehicleObject? {
+       val vehicleRequest =  vehicleClient.getVehicleId(sessionManager.getHash(), chapa).execute()
+
+        if (vehicleRequest.code() == 200){
+            return vehicleRequest.body()?.vehicleObject
+        }
+        return null
     }
 }

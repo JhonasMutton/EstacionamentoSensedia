@@ -8,7 +8,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.estacionamento.R
+import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.databinding.LayoutActivityHomeBinding
+import com.estacionamento.session.SessionManager
 import java.lang.Exception
 
 class HomeActivity : AppCompatActivity() {
@@ -22,7 +24,7 @@ class HomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this,
             R.layout.layout_activity_home
         )
-        viewModelFactory = HomeViewModelFactory(applicationContext)
+        viewModelFactory = HomeViewModelFactory(applicationContext )
         viewModel =
             ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
 
@@ -112,15 +114,16 @@ class HomeActivity : AppCompatActivity() {
             return false
         }
 
-        //verifica se os 3 primeiros caracteres digitados são letras
-        if (!placaCarro.get(0).isLetter() || !placaCarro.get(1).isLetter() || !placaCarro.get(2).isLetter()) {
-            return false
-        }
-
-        //verifica se os quatro últimos caracteres digitados são números
-        if (!placaCarro.get(3).isDigit() || !placaCarro.get(4).isDigit() || !placaCarro.get(5).isDigit() || !placaCarro.get(6).isDigit()) {
-            return false
-        }
+        //TODO FAZER A VALIDAÇÃO INCLUINDO NOVO PADRÃO DE PLACAS
+//        //verifica se os 3 primeiros caracteres digitados são letras
+//        if (!placaCarro.get(0).isLetter() || !placaCarro.get(1).isLetter() || !placaCarro.get(2).isLetter()) {
+//            return false
+//        }
+//
+//        //verifica se os quatro últimos caracteres digitados são números
+//        if (!placaCarro.get(3).isDigit() || !placaCarro.get(4).isDigit() || !placaCarro.get(5).isDigit() || !placaCarro.get(6).isDigit()) {
+//            return false
+//        }
 
         //retorna verdadeiro se perceber que a string tem o formato de uma placa
         return true
