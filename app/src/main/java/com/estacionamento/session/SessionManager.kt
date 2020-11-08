@@ -11,6 +11,7 @@ class SessionManager(context: Context) {
 
     companion object {
         const val USERNAME_KEY = "USERNAME"
+        const val CONDUCTOR_ID_KEY = "CONDUCTOR_ID"
         const val HASH_KEY = "HASH"
         const val LOGGED_IN_LEY = "LOGGED_IN_TIME"
         const val IS_LOGGED = "IS_LOGGED"
@@ -19,6 +20,7 @@ class SessionManager(context: Context) {
     fun startSession(loginResponse: LoginResponse){
         editor.putString(USERNAME_KEY, loginResponse.objeto.nome)
         editor.putString(HASH_KEY, loginResponse.objeto.hashAcesso)
+        editor.putInt(CONDUCTOR_ID_KEY, loginResponse.objeto.condutorID)
         val userLoggedInTime = Calendar.getInstance().time.time
         editor.putLong(LOGGED_IN_LEY, userLoggedInTime)
         editor.putBoolean(IS_LOGGED, true)
@@ -32,6 +34,8 @@ class SessionManager(context: Context) {
     }
 
     fun getUsername() = sharedPreferences.getString(USERNAME_KEY,"Usuário")
+
+    fun getConductorId() = sharedPreferences.getInt(CONDUCTOR_ID_KEY, 0)
 
     fun getHash() = sharedPreferences.getString(HASH_KEY,"invalid")
 
