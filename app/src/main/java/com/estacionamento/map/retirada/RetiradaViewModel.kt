@@ -6,22 +6,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import com.estacionamento.api.carrorama.reservation.ReservationClient
+import com.estacionamento.api.carrorama.reservation.ReservationRequest
 import com.estacionamento.database.MyDataBase
-import com.estacionamento.map.devolucao.DevolucaoViewState
+import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.util.*
 
 class RetiradaViewModel(
     private val context: Context
 ): ViewModel() {
 
     private val _liveData: MutableLiveData<RetiradaViewState> = MutableLiveData()
-
+    private val reservationClient: ReservationClient = ReservationClient()
+    private val sessionManager: SessionManager = SessionManager(context)
     private var carId = -1
-
     private var carLocation = -1
-
     private var carLocationId = -1
 
     private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
@@ -50,12 +52,31 @@ class RetiradaViewModel(
         _liveData.value = RetiradaViewState.SendingCar
         try {
             GlobalScope.launch {
-                if(carLocationId == -1)
-                {
+                if (carLocationId == -1) {
                     val exception = Exception("infoError")
                     _liveData.postValue(RetiradaViewState.Error(exception))
-                }
-                else {
+                } else {
+                    //Faz a reserva TODO AJUSTAR onde é chamado e como é montado a request
+                    val reservation = ReservationRequest(
+                        0,
+                        Calendar.getInstance().time.toString(),
+                        Calendar.getInstance().time.toString(),
+                        false,
+                        carId,
+                        sessionManager.getConductorId(),
+                        0,
+                        carLocation.toString(),
+                        carLocation.toString(),
+                        "",
+                        ""
+                    )
+
+                   val reserveResponse = reservationClient.reserve(sessionManager.getHash(), reservation).execute()
+                    if (!reserveResponse.isSuccessful){
+                        val exception = Exception("infoError")
+                        _liveData.postValue(RetiradaViewState.Error(exception))
+                        return@launch
+                    }
                     veiculoLocalizacaoDao.updateDisponibilidade(carLocationId)
                     db.close()
                     _liveData.postValue(RetiradaViewState.CarSent)
