@@ -1,6 +1,7 @@
 package com.estacionamento.database
 
 import androidx.room.*
+import com.estacionamento.database.model.VeiculoLocalizacao
 
 @Dao
 interface VeiculoLocalizacaoDao {

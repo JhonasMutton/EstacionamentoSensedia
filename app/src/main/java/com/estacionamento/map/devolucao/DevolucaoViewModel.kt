@@ -6,12 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
-import com.estacionamento.database.MyDataBase
-import com.estacionamento.database.VeiculoLocalizacao
-import com.estacionamento.map.retirada.RetiradaViewState
+import com.estacionamento.database.model.VeiculoLocalizacao
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 import java.lang.Exception
 
 class DevolucaoViewModel(

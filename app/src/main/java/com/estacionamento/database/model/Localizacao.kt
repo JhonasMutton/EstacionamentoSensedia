@@ -1,4 +1,4 @@
-package com.estacionamento.database
+package com.estacionamento.database.model
 
 import androidx.room.Entity
 import androidx.room.ColumnInfo

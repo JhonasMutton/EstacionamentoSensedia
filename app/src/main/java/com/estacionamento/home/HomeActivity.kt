@@ -8,9 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.estacionamento.R
-import com.estacionamento.api.carrorama.login.LoginClient
 import com.estacionamento.databinding.LayoutActivityHomeBinding
-import com.estacionamento.session.SessionManager
 import java.lang.Exception
 
 class HomeActivity : AppCompatActivity() {
@@ -38,7 +36,8 @@ class HomeActivity : AppCompatActivity() {
         binding.buttonDevolverCarro.setOnClickListener{
             sendCar( binding.inputPlacaCarroInterno.text.toString().toUpperCase() )
         }
-        viewModel.startDb()
+        viewModel.connectDb()
+
         viewModel.liveData.observe(this, Observer { viewState ->
             when (viewState) {
                 HomeViewState.LoadingCarInfo -> showLoadingView()

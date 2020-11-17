@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.estacionamento.api.carrorama.reservation.ReservationClient
 import com.estacionamento.api.carrorama.reservation.ReservationRequest
-import com.estacionamento.database.MyDataBase
 import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
