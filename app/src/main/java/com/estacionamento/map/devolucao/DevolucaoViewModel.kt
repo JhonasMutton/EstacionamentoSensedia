@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import com.estacionamento.api.parking.park.ParkingClient
+import com.estacionamento.api.parking.park.model.ParkedCar
 import com.estacionamento.database.model.VeiculoLocalizacao
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -13,20 +15,12 @@ import java.lang.Exception
 
 class DevolucaoViewModel(
     private val context: Context
-): ViewModel() {
+) : ViewModel() {
 
     private val _liveData: MutableLiveData<DevolucaoViewState> = MutableLiveData()
-
+    private val parkingClient: ParkingClient = ParkingClient()
     private var selectedIndex = -1
-
     private var carId = -1
-
-//    private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
-//        .build()
-
-//    private val veiculoLocalizacaoDao = db.getVeiculoLocalizacaoDao()
-//    private val veiculoDao = db.getVeiculoDao()
-//    private val localizacaoDao = db.getLocalizacaoDao()
 
     val liveData: LiveData<DevolucaoViewState>
         get() = _liveData
@@ -35,48 +29,56 @@ class DevolucaoViewModel(
         _liveData.value = DevolucaoViewState.LoadingMap
     }
 
-    fun loadMap(){
+    fun loadMap() {
         _liveData.value = DevolucaoViewState.FinishedMap
     }
 
-    fun mapException(exception: Exception){
+    fun mapException(exception: Exception) {
         _liveData.value = DevolucaoViewState.Error(exception)
     }
 
-    fun sendCar(){
+    fun sendCar() {
         _liveData.value = DevolucaoViewState.SendingCar
         try {
             GlobalScope.launch {
-                if(carId == -1 || selectedIndex == -1)
-                {
+                if (carId == -1 || selectedIndex == -1) {
                     val exception = Exception("infoError")
                     _liveData.postValue(DevolucaoViewState.Error(exception))
-                }
-                else
-                {
-                    //TODO Remove o carro estacionado na vaga post /parking e devolve o carro no carrorama
-                    //veiculoLocalizacaoDao.insert(VeiculoLocalizacao(null, carId, selectedIndex, 1))
+                } else {
+                    val parkedCar = ParkedCar(selectedIndex, carId)
+                    setParkingSpace(parkedCar) ?: run {
+                        val exception = Exception("infoError")
+                        _liveData.postValue(DevolucaoViewState.Error(exception))
+                        return@launch
+                    }
                     _liveData.postValue(DevolucaoViewState.CarSent)
                 }
             }
-        }
-        catch (ex: Exception){
+        } catch (ex: Exception) {
             _liveData.value = DevolucaoViewState.Error(ex)
         }
     }
 
     fun getSelectedIndex(): Int = selectedIndex
 
-    fun setSelectedIndex(index: Int){
+    fun setSelectedIndex(index: Int) {
         selectedIndex = index
         Log.d("debug", "setSelectedIndex: index - $selectedIndex")
     }
 
     fun getCarId(): Int = carId
 
-    fun setCarId(id: Int){
+    fun setCarId(id: Int) {
         carId = id
         Log.d("debug", "setCarId: index - $carId")
+    }
+
+    private fun setParkingSpace(parkedCar: ParkedCar): ParkedCar? {
+        val parkingSpace = parkingClient.parkingACar(parkedCar).execute()
+        if (parkingSpace.isSuccessful) {
+            return parkingSpace.body()
+        }
+        return null
     }
 
 }

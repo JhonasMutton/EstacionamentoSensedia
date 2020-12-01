@@ -16,7 +16,6 @@ import com.estacionamento.database.VeiculoLocalizacaoDaoImpl
 import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.*
 import java.lang.Exception
-import java.lang.NullPointerException
 
 
 class HomeViewModel(
@@ -84,7 +83,17 @@ class HomeViewModel(
                             _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
                             return@launch
                         }
+
+                    parkingSpaceCar.location ?: run {
+                        _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
+                        return@launch
+                    }
                     carLocation = parkingSpaceCar.location
+
+                    parkingSpaceCar.id ?: run {
+                        _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
+                        return@launch
+                    }
                     parkingSpaceId = parkingSpaceCar.id
                     /*TODO FAZER UMA SEGUNDA AVALIAÇÃO VIA CARRORAMA  E FAZER A RETIRADA DO CARRO NO MESMO*/
                     _liveData.postValue(HomeViewState.CarInfoLoadedRetirada) //TODO CHAMA A RETIRADA
@@ -95,17 +104,26 @@ class HomeViewModel(
         }
     }
 
-    fun devolveCarro() {
+    fun carReturn() {
         _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
-//                carId = veiculoDao.getVeiculo(chapa TODO PEGAR O CAR ID PELA API
+                val vehicleObject = getVehicle()
+                vehicleObject ?: run {
+                    _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroInvalido")))
+                    return@launch
+                }
 
+                carId = vehicleObject.id
                 if (validateCar()) {
                     Log.d("debug", "getCarId: carId - $carId")
-                    carLocation = veiculoLocalizacaoDao.veiculoDisponivel(carId)
-                    if (validateLocationDevolucao()) {
+                    val parkingSpaceCar = null //TODO RETIRAR MOCK getParkingSpaceByCar()
+
+                    if (parkingSpaceCar == null) {
                         _liveData.postValue(HomeViewState.CarInfoLoadedDevolucao)
+                    } else {
+                        val exception = Exception("carroDevolvido")
+                        _liveData.postValue(HomeViewState.Error(exception))
                     }
                 }
             }
@@ -132,8 +150,7 @@ class HomeViewModel(
         return true
     }
 
-
-    private suspend fun validateLocationDevolucao(): Boolean {
+    private suspend fun validateLocationCarReturn(): Boolean {
         if (carLocation != 0) {
             val exception = Exception("carroDevolvido")
             _liveData.postValue(HomeViewState.Error(exception))

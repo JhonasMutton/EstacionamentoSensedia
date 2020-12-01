@@ -41,7 +41,7 @@ class HomeActivity : AppCompatActivity() {
         viewModel.liveData.observe(this, Observer { viewState ->
             when (viewState) {
                 HomeViewState.LoadingCarInfo -> showLoadingView()
-                is HomeViewState.CarInfoLoadedDevolucao -> sendCarDevolucao()
+                is HomeViewState.CarInfoLoadedDevolucao -> sendCarReturn()
                 is HomeViewState.CarInfoLoadedRetirada -> sendCarPickup()
                 is HomeViewState.Error -> showErrorView(viewState.exception)
             }
@@ -79,8 +79,8 @@ class HomeActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun sendCarDevolucao() {
-        val intent = getDevolucaoIntent()
+    private fun sendCarReturn() {
+        val intent = getCarReturnIntent()
         intent.putExtra("carId", viewModel.getCarId())
         Log.d("debug", "sendCarDevolucao: carId - ${viewModel.getCarId()}")
         startActivity(intent)
@@ -100,7 +100,7 @@ class HomeActivity : AppCompatActivity() {
             viewModel.showPlacaInvalidaError()
         } else {
             viewModel.setLicensePlate(placaCarro)
-            viewModel.devolveCarro()
+            viewModel.carReturn()
         }
     }
 
@@ -132,7 +132,7 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getDevolucaoIntent() = Intent(DEVOLUCAO_INTENT)
+    private fun getCarReturnIntent() = Intent(DEVOLUCAO_INTENT)
 
     private fun getRetiradaIntent() = Intent(RETIRADA_INTENT)
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.estacionamento.api.carrorama.reservation.ReservationClient
 import com.estacionamento.api.parking.park.ParkingClient
+import com.estacionamento.api.parking.park.model.ParkedCar
 import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -47,7 +48,10 @@ class RetiradaViewModel(
                     val exception = Exception("infoError")
                     _liveData.postValue(RetiradaViewState.Error(exception))
                 } else {
-                    parkingClient.deleteCarInParkingSpace(carId)
+                    if(!deleteParkingSpaceByCar()){
+                        val exception = Exception("infoError")
+                        _liveData.postValue(RetiradaViewState.Error(exception))
+                    }
                     _liveData.postValue(RetiradaViewState.CarSent)
                 }
             }
@@ -77,6 +81,11 @@ class RetiradaViewModel(
     fun setParkingSpace(id: Int){
         parkingSpaceId = id
         Log.d("debug", "setCarLocationId: index - $carLocation")
+    }
+
+    private fun deleteParkingSpaceByCar(): Boolean {
+        val parkingSpace = parkingClient.deleteCarInParkingSpace(carId).execute()
+        return parkingSpace.isSuccessful
     }
 
 }
