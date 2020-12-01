@@ -5,7 +5,7 @@ import androidx.room.*
 
 
 
-@Entity (tableName = "veiculolocalizacao")
+@Entity (tableName = "parkingSpace")
 
 class VeiculoLocalizacao(@PrimaryKey (autoGenerate = true)
                          var id_veiculo_localizacao: Int? = 1,

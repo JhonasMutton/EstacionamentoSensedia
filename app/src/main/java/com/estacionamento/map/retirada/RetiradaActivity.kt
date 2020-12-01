@@ -47,9 +47,9 @@ class RetiradaActivity : AppCompatActivity() {
 
     private fun loadDataFromIntent(intent: Intent){
         viewModel.setCarId(intent.getIntExtra("carId", -1))
-        viewModel.setCarLocation(intent.getIntExtra("localizacao", -1))
-        viewModel.setCarLocationId(intent.getIntExtra("veiculoLocalizacao", -1))
-        Log.d("debug", "loadDataFromIntent: carId - ${viewModel.getCarId()} location - ${viewModel.getCarLocation()} veiculoLocalizacao - ${viewModel.getCarLocationId()}")
+        viewModel.setCarLocation(intent.getIntExtra("carLocation", -1))
+        viewModel.setParkingSpace(intent.getIntExtra("parkingSpace", -1))
+        Log.d("debug", "loadDataFromIntent: carId - ${viewModel.getCarId()} location - ${viewModel.getCarLocation()} veiculoLocalizacao - ${viewModel.getParkingSpace()}")
     }
 
     private fun loadFeatures(){
@@ -118,7 +118,7 @@ class RetiradaActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .setPositiveButton("Confirmar") { dialog, which ->
-                viewModel.sendCar()
+                viewModel.sendCarToPickup()
             }
             .show()
     }

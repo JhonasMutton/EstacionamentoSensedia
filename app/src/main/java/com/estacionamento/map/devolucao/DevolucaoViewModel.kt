@@ -21,12 +21,12 @@ class DevolucaoViewModel(
 
     private var carId = -1
 
-    private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
-        .build()
+//    private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
+//        .build()
 
-    private val veiculoLocalizacaoDao = db.getVeiculoLocalizacaoDao()
-    private val veiculoDao = db.getVeiculoDao()
-    private val localizacaoDao = db.getLocalizacaoDao()
+//    private val veiculoLocalizacaoDao = db.getVeiculoLocalizacaoDao()
+//    private val veiculoDao = db.getVeiculoDao()
+//    private val localizacaoDao = db.getLocalizacaoDao()
 
     val liveData: LiveData<DevolucaoViewState>
         get() = _liveData
@@ -54,7 +54,8 @@ class DevolucaoViewModel(
                 }
                 else
                 {
-                    veiculoLocalizacaoDao.insert(VeiculoLocalizacao(null, carId, selectedIndex, 1))
+                    //TODO Remove o carro estacionado na vaga post /parking e devolve o carro no carrorama
+                    //veiculoLocalizacaoDao.insert(VeiculoLocalizacao(null, carId, selectedIndex, 1))
                     _liveData.postValue(DevolucaoViewState.CarSent)
                 }
             }
