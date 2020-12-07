@@ -10,12 +10,9 @@ import com.estacionamento.api.carrorama.vehicle.VehicleClient
 import com.estacionamento.api.carrorama.vehicle.VehicleObject
 import com.estacionamento.api.parking.park.ParkingClient
 import com.estacionamento.api.parking.park.model.ParkedCar
-import com.estacionamento.database.DB
-import com.estacionamento.database.LocalizacaoDaoImpl
-import com.estacionamento.database.VeiculoLocalizacaoDaoImpl
 import com.estacionamento.session.SessionManager
-import kotlinx.coroutines.*
-import java.lang.Exception
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class HomeViewModel(
@@ -35,14 +32,9 @@ class HomeViewModel(
     private var parkingSpaceId = -1
     private lateinit var licensePlate: String
 
-    private val db = DB()
-
     init {
 
     }
-
-    val veiculoLocalizacaoDao = VeiculoLocalizacaoDaoImpl(db)
-    val localizacaoDao = LocalizacaoDaoImpl(db)
 
     fun getLicensePlate(): String {
         return licensePlate
@@ -180,7 +172,15 @@ class HomeViewModel(
         val parkingSpace = parkingClient.getParkingSpaceByCar(carId).execute()
 
         if (parkingSpace.code() == 200) {
-            return parkingSpace.body()
+
+            return parkingSpace.body()?.let {
+                if (it.isNotEmpty()) {
+                    it[0]
+                } else {
+                    null
+                }
+            }
+
         }
         return null
     }

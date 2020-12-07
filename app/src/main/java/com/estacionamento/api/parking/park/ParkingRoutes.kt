@@ -14,7 +14,7 @@ interface ParkingRoutes {
     fun parkingACar(@Body parkedCar: ParkedCar): Call<ParkedCar>
 
     @GET("${Companion.basePath}/cars/{carId}")
-    fun getParkingSpaceByCar(@Path("carId") carId: Int): Call<ParkedCar>
+    fun getParkingSpaceByCar(@Path("carId") carId: Int): Call<List<ParkedCar>>
 
     @DELETE("${Companion.basePath}/cars/{carId}")
     fun deleteCarInParkingSpace(@Path("carId") carId: Int): Call<Objects>
@@ -23,7 +23,6 @@ interface ParkingRoutes {
     fun getParkingSpaceByLocation(@Path("locationId") locationId: Int): Call<ParkedCar>
 
     companion object {
-        const val basePath = "/JhonasMutton/Estacionamento/1.0.0/parking"
-//        const val basePath  = "/parking" TODO VOLTAR
+        const val basePath  = "/parking"
     }
 }

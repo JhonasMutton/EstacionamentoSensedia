@@ -1,6 +1,9 @@
 package com.estacionamento.api.parking.park.model
 
 import com.google.gson.annotations.SerializedName
+import java.time.Instant
+import java.time.LocalDateTime
+import java.util.*
 
 data class ParkedCar(
     @SerializedName("id") val id: Int?,
@@ -9,6 +12,8 @@ data class ParkedCar(
     @SerializedName("carId") val carId: Int,
     @SerializedName("parkDate") val parkDate: String?
 ) {
-    constructor(locationId: Int, carId: Int) : this(null, null, locationId, carId, null)
+    constructor(locationId: Int, carId: Int) : this(null, null, locationId, carId,
+        LocalDateTime.now().toString()
+    )
 }
 
