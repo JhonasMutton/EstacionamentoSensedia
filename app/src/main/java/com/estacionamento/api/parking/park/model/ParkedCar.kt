@@ -12,8 +12,6 @@ data class ParkedCar(
     @SerializedName("carId") val carId: Int,
     @SerializedName("parkDate") val parkDate: String?
 ) {
-    constructor(locationId: Int, carId: Int) : this(null, null, locationId, carId,
-        LocalDateTime.now().toString()
-    )
+    constructor(locationId: Int, carId: Int) : this(null, null, locationId, carId, null)
 }
 

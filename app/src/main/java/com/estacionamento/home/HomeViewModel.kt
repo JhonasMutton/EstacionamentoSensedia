@@ -76,11 +76,8 @@ class HomeViewModel(
                             return@launch
                         }
 
-                    parkingSpaceCar.location ?: run {
-                        _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
-                        return@launch
-                    }
-                    carLocation = parkingSpaceCar.location
+                    parkingSpaceCar.locationId
+                    carLocation = parkingSpaceCar.locationId
 
                     parkingSpaceCar.id ?: run {
                         _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
