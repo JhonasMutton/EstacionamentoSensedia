@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.estacionamento.api.carrorama.reservation.ReservationClient
 import com.estacionamento.api.parking.park.ParkingClient
-import com.estacionamento.api.parking.park.model.ParkedCar
 import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,7 +21,7 @@ class RetiradaViewModel(
     private val parkingClient: ParkingClient = ParkingClient()
     private val sessionManager: SessionManager = SessionManager(context)
     private var carId = -1
-    private var carLocation = -1
+    private var locationId = -1
     private var parkingSpaceId = -1
 
     val liveData: LiveData<RetiradaViewState>
@@ -36,15 +35,11 @@ class RetiradaViewModel(
         _liveData.value = RetiradaViewState.FinishedMap
     }
 
-    fun mapException(exception: Exception){
-        _liveData.value = RetiradaViewState.Error(exception)
-    }
-
     fun sendCarToPickup() {
         _liveData.value = RetiradaViewState.SendingCar
         try {
             GlobalScope.launch {
-                if (parkingSpaceId == -1) { //TODO modificar essa logica
+                if (parkingSpaceId == -1) {
                     val exception = Exception("infoError")
                     _liveData.postValue(RetiradaViewState.Error(exception))
                 } else {
@@ -69,18 +64,18 @@ class RetiradaViewModel(
         Log.d("debug", "setCarId: index - $carId")
     }
 
-    fun getCarLocation(): Int = carLocation
+    fun getLocationId(): Int = locationId
 
     fun getParkingSpace(): Int = parkingSpaceId
 
-    fun setCarLocation(id: Int){
-        carLocation = id
-        Log.d("debug", "setCarLocation: index - $carLocation")
+    fun setLocationId(id: Int){
+        locationId = id
+        Log.d("debug", "setLocationId: index - $locationId")
     }
 
     fun setParkingSpace(id: Int){
         parkingSpaceId = id
-        Log.d("debug", "setCarLocationId: index - $carLocation")
+        Log.d("debug", "setCarLocationId: index - $locationId")
     }
 
     private fun deleteParkingSpaceByCar(): Boolean {

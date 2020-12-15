@@ -15,7 +15,7 @@ class ParkingClient {
     fun parkingACar(parkedCar: ParkedCar): Call<ParkedCar> = parkingRoutes.parkingACar(parkedCar)
 
     fun getParkingSpaceByCar(carId: Int): Call<List<ParkedCar>> =
-        parkingRoutes.getParkingSpaceByCar(carId) //TODO REVISAR RETORNO
+        parkingRoutes.getParkingSpaceByCar(carId)
 
     fun deleteCarInParkingSpace(carId: Int): Call<Objects> =
         parkingRoutes.deleteCarInParkingSpace(carId)

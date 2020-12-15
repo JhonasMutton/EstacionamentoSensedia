@@ -2,7 +2,6 @@ package com.estacionamento.api.carrorama.reservation
 
 import com.google.gson.annotations.SerializedName
 
-//TODO MUDAR PARA O OBJETO CORRETO
 data class ReservationObject (
     @SerializedName("id") val id : Int,
     @SerializedName("placa") val placa : String,

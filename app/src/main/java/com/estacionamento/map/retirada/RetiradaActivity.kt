@@ -47,9 +47,9 @@ class RetiradaActivity : AppCompatActivity() {
 
     private fun loadDataFromIntent(intent: Intent){
         viewModel.setCarId(intent.getIntExtra("carId", -1))
-        viewModel.setCarLocation(intent.getIntExtra("carLocation", -1))
+        viewModel.setLocationId(intent.getIntExtra("carLocation", -1))
         viewModel.setParkingSpace(intent.getIntExtra("parkingSpace", -1))
-        Log.d("debug", "loadDataFromIntent: carId - ${viewModel.getCarId()} location - ${viewModel.getCarLocation()} veiculoLocalizacao - ${viewModel.getParkingSpace()}")
+        Log.d("debug", "loadDataFromIntent: carId - ${viewModel.getCarId()} location - ${viewModel.getLocationId()} veiculoLocalizacao - ${viewModel.getParkingSpace()}")
     }
 
     private fun loadFeatures(){
@@ -86,9 +86,9 @@ class RetiradaActivity : AppCompatActivity() {
     }
 
     private fun showCarLocation(){
-        Log.d("debug", "showCarLocation: carLocation - ${viewModel.getCarLocation()}")
-        if(viewModel.getCarLocation() != -1) {
-            val frameLayout = binding.map.mapGrid[viewModel.getCarLocation()] as FrameLayout
+        Log.d("debug", "showCarLocation: carLocation - ${viewModel.getLocationId()}")
+        if(viewModel.getLocationId() != -1) {
+            val frameLayout = binding.map.mapGrid[viewModel.getLocationId()] as FrameLayout
             val viewStub = frameLayout[1]
             viewStub.visibility = View.VISIBLE
         }

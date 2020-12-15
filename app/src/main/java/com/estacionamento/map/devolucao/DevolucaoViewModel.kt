@@ -5,10 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.room.Room
 import com.estacionamento.api.parking.park.ParkingClient
 import com.estacionamento.api.parking.park.model.ParkedCar
-import com.estacionamento.database.model.VeiculoLocalizacao
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -19,7 +17,7 @@ class DevolucaoViewModel(
 
     private val _liveData: MutableLiveData<DevolucaoViewState> = MutableLiveData()
     private val parkingClient: ParkingClient = ParkingClient()
-    private var selectedIndex = -1
+    private var locationId = -1
     private var carId = -1
 
     val liveData: LiveData<DevolucaoViewState>
@@ -33,19 +31,15 @@ class DevolucaoViewModel(
         _liveData.value = DevolucaoViewState.FinishedMap
     }
 
-    fun mapException(exception: Exception) {
-        _liveData.value = DevolucaoViewState.Error(exception)
-    }
-
     fun sendCar() {
         _liveData.value = DevolucaoViewState.SendingCar
         try {
             GlobalScope.launch {
-                if (carId == -1 || selectedIndex == -1) {
+                if (carId == -1 || locationId == -1) {
                     val exception = Exception("infoError")
                     _liveData.postValue(DevolucaoViewState.Error(exception))
                 } else {
-                    val parkedCar = ParkedCar(selectedIndex, carId)
+                    val parkedCar = ParkedCar(locationId, carId)
                     setParkingSpace(parkedCar) ?: run {
                         val exception = Exception("infoError")
                         _liveData.postValue(DevolucaoViewState.Error(exception))
@@ -59,11 +53,11 @@ class DevolucaoViewModel(
         }
     }
 
-    fun getSelectedIndex(): Int = selectedIndex
+    fun getLocationId(): Int = locationId
 
-    fun setSelectedIndex(index: Int) {
-        selectedIndex = index
-        Log.d("debug", "setSelectedIndex: index - $selectedIndex")
+    fun setLocationId(locationId: Int) {
+        this.locationId = locationId
+        Log.d("debug", "setLocationId: index - ${this.locationId}")
     }
 
     fun getCarId(): Int = carId

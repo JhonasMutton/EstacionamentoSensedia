@@ -16,6 +16,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: LayoutActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
     private lateinit var viewModelFactory: HomeViewModelFactory
+    private val regex = Regex("[A-Z]{3}[0-9][0-9A-Z][0-9]{2}")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +71,7 @@ class HomeActivity : AppCompatActivity() {
         intent.putExtra(
             "carLocation",
             viewModel.getCarLocation()
-        ) //TODO Verificar  as variaveis injetadas
+        )
         intent.putExtra("parkingSpace", viewModel.getParkingSpaceId())
         Log.d(
             "debug",
@@ -111,25 +112,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun validaPlaca(placaCarro: String): Boolean {
-
-        //verifica o tamanho da string para saber se o número de caracteres da placa está correto
-        if (placaCarro.length != 7) {
-            return false
-        }
-
-        //TODO FAZER A VALIDAÇÃO INCLUINDO NOVO PADRÃO DE PLACAS
-//        //verifica se os 3 primeiros caracteres digitados são letras
-//        if (!placaCarro.get(0).isLetter() || !placaCarro.get(1).isLetter() || !placaCarro.get(2).isLetter()) {
-//            return false
-//        }
-//
-//        //verifica se os quatro últimos caracteres digitados são números
-//        if (!placaCarro.get(3).isDigit() || !placaCarro.get(4).isDigit() || !placaCarro.get(5).isDigit() || !placaCarro.get(6).isDigit()) {
-//            return false
-//        }
-
-        //retorna verdadeiro se perceber que a string tem o formato de uma placa
-        return true
+       return regex.matches(placaCarro)
     }
 
     private fun getCarReturnIntent() = Intent(DEVOLUCAO_INTENT)

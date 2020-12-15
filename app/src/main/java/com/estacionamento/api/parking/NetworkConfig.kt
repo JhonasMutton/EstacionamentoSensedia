@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object NetworkConfig {
     lateinit var context: Context
-    private const val BASE_URL = "http://192.168.2.104:3000/"
+    private const val BASE_URL = "http://192.168.2.105:3000/"
     private val retrofit: Retrofit
 
     init {

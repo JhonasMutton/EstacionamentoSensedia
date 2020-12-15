@@ -32,10 +32,6 @@ class HomeViewModel(
     private var parkingSpaceId = -1
     private lateinit var licensePlate: String
 
-    init {
-
-    }
-
     fun getLicensePlate(): String {
         return licensePlate
     }
@@ -67,7 +63,7 @@ class HomeViewModel(
                 }
 
                 carId = vehicleObject.id
-                if (validateCar()) {//TODO REFATORAR O VALIDATE
+                if (validateCar()) {
                     Log.d("debug", "getCarId: carId - $carId")
 
                     val parkingSpaceCar = getParkingSpaceByCar()
@@ -76,7 +72,6 @@ class HomeViewModel(
                             return@launch
                         }
 
-                    parkingSpaceCar.locationId
                     carLocation = parkingSpaceCar.locationId
 
                     parkingSpaceCar.id ?: run {
