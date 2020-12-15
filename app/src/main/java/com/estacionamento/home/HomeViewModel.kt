@@ -1,14 +1,18 @@
 package com.estacionamento.home
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.room.Room
-import com.estacionamento.database.*
-import kotlinx.coroutines.*
-import java.lang.Exception
+import com.estacionamento.api.carrorama.vehicle.VehicleClient
+import com.estacionamento.api.carrorama.vehicle.VehicleObject
+import com.estacionamento.api.parking.park.ParkingClient
+import com.estacionamento.api.parking.park.model.ParkedCar
+import com.estacionamento.session.SessionManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class HomeViewModel(
@@ -16,113 +20,104 @@ class HomeViewModel(
 ) : ViewModel() {
 
     val homeLiveData: MutableLiveData<String> = MutableLiveData()
-
     private val _liveData: MutableLiveData<HomeViewState> = MutableLiveData()
+    private val vehicleClient: VehicleClient = VehicleClient()
+    private val parkingClient: ParkingClient = ParkingClient()
+    private val sessionManager: SessionManager = SessionManager(context)
 
     val liveData: LiveData<HomeViewState>
         get() = _liveData
-
     private var carId = -1
-
     private var carLocation = -1
+    private var parkingSpaceId = -1
+    private lateinit var licensePlate: String
 
-    private var veiculoLocalizacao = -1
-
-    private lateinit var chapa: String
-
-    private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
-    .build()
-
-    val veiculoDao = db.getVeiculoDao()
-    val veiculoLocalizacaoDao = db.getVeiculoLocalizacaoDao()
-    val localizacaoDao = db.getLocalizacaoDao()
-
-    fun getPlaca(): String{
-        return chapa
+    fun getLicensePlate(): String {
+        return licensePlate
     }
 
-    fun getCarId(): Int{
+    fun getCarId(): Int {
         return carId
     }
 
-    fun getCarLocation(): Int{
+    fun getCarLocation(): Int {
         return carLocation
     }
 
-    fun getVeiculoLocalizacao(): Int{
-        return veiculoLocalizacao
+    fun getParkingSpaceId(): Int {
+        return parkingSpaceId
     }
 
-    fun setPlaca(chapaVeiculo : String){
-        chapa = chapaVeiculo
+    fun setLicensePlate(carLicencePlate: String) {
+        licensePlate = carLicencePlate
     }
 
-    fun startDb(){
-            GlobalScope.launch {
-                val veiculo1 = Veiculo(null,"AAA1111")
-                veiculoDao.insert(veiculo1)
-                val veiculo2 = Veiculo(null,"ABC1234")
-                veiculoDao.insert(veiculo2)
-                val veiculo3 = Veiculo(null,"EDE1188")
-                veiculoDao.insert(veiculo3)
-                for(x in 0 until 480)
-                {
-                    val localizacao = Localizacao(null,"X")
-                    localizacaoDao.insert(localizacao)
-                }
-                val veiculoLocalizacaoSecreta = VeiculoLocalizacao(null,0,0, 0)
-                veiculoLocalizacaoDao.insert(veiculoLocalizacaoSecreta)
-                val veiculoLocalizacao = VeiculoLocalizacao(null,1,230, 1)
-                veiculoLocalizacaoDao.insert(veiculoLocalizacao)
-                Log.d("debug", "BANCO CRIADO")
-            }
-    }
-
-    fun sendCar() {
+    fun callCarPickup() {
         _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
-                carId = veiculoDao.getVeiculo(chapa)
-                if(validateCar()){
+                val vehicleObject = getVehicle()
+                vehicleObject ?: run {
+                    _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroInvalido")))
+                    return@launch
+                }
+
+                carId = vehicleObject.id
+                if (validateCar()) {
                     Log.d("debug", "getCarId: carId - $carId")
-                    carLocation = veiculoLocalizacaoDao.veiculoDisponivel(carId)
-                    if(validateLocation())
-                    {
-                        veiculoLocalizacao = veiculoLocalizacaoDao.getVeiculoLocalizacao(carId,carLocation)
-                        _liveData.postValue(HomeViewState.CarInfoLoadedRetirada)
+
+                    val parkingSpaceCar = getParkingSpaceByCar()
+                        ?: run {
+                            _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
+                            return@launch
+                        }
+
+                    carLocation = parkingSpaceCar.locationId
+
+                    parkingSpaceCar.id ?: run {
+                        _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroRetirado")))
+                        return@launch
                     }
+                    parkingSpaceId = parkingSpaceCar.id
+                    /*TODO FAZER UMA SEGUNDA AVALIAÇÃO VIA CARRORAMA  E FAZER A RETIRADA DO CARRO NO MESMO*/
+                    _liveData.postValue(HomeViewState.CarInfoLoadedRetirada) //TODO CHAMA A RETIRADA
                 }
             }
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             _liveData.value = HomeViewState.Error(e)
         }
     }
 
-    fun sendCarDevolucao() {
+    fun carReturn() {
         _liveData.value = HomeViewState.LoadingCarInfo
         try {
             GlobalScope.launch {
-                carId = veiculoDao.getVeiculo(chapa)
-                if(validateCar()){
+                val vehicleObject = getVehicle()
+                vehicleObject ?: run {
+                    _liveData.postValue(HomeViewState.Error(Resources.NotFoundException("carroInvalido")))
+                    return@launch
+                }
+
+                carId = vehicleObject.id
+                if (validateCar()) {
                     Log.d("debug", "getCarId: carId - $carId")
-                    carLocation = veiculoLocalizacaoDao.veiculoDisponivel(carId)
-                    if(validateLocationDevolucao())
-                    {
+                    val parkingSpaceCar = null //TODO RETIRAR MOCK getParkingSpaceByCar()
+
+                    if (parkingSpaceCar == null) {
                         _liveData.postValue(HomeViewState.CarInfoLoadedDevolucao)
+                    } else {
+                        val exception = Exception("carroDevolvido")
+                        _liveData.postValue(HomeViewState.Error(exception))
                     }
                 }
             }
-        }
-        catch (e: Exception)
-        {
+        } catch (e: Exception) {
             _liveData.value = HomeViewState.Error(e)
         }
     }
 
-    private suspend fun validateCar(): Boolean{
-        if(carId == 0){
+    private suspend fun validateCar(): Boolean {
+        if (carId == 0) {
             val exception = Exception("carroInvalido")
             _liveData.postValue(HomeViewState.Error(exception))
             return false
@@ -130,8 +125,8 @@ class HomeViewModel(
         return true
     }
 
-    private suspend fun validateLocation(): Boolean{
-        if(carLocation == 0){
+    private suspend fun validateLocation(): Boolean {
+        if (carLocation == 0) {
             val exception = Exception("carroRetirado")
             _liveData.postValue(HomeViewState.Error(exception))
             return false
@@ -139,9 +134,8 @@ class HomeViewModel(
         return true
     }
 
-
-    private suspend fun validateLocationDevolucao(): Boolean{
-        if(carLocation != 0){
+    private suspend fun validateLocationCarReturn(): Boolean {
+        if (carLocation != 0) {
             val exception = Exception("carroDevolvido")
             _liveData.postValue(HomeViewState.Error(exception))
             return false
@@ -149,8 +143,37 @@ class HomeViewModel(
         return true
     }
 
-    fun showPlacaInvalidaError(){
+    fun showPlacaInvalidaError() {
         val exception = Exception("placaInvalida")
-        _liveData.value  = HomeViewState.Error(exception)
+        _liveData.value = HomeViewState.Error(exception)
+    }
+
+    private fun getVehicle(): VehicleObject? {
+        //TODO TIRAR O MOCK
+//        val vehicleRequest = vehicleClient.getVehicleId(sessionManager.getHash(), licensePlate).execute()
+//
+//        if (vehicleRequest.code() == 200) {
+//            return vehicleRequest.body()?.vehicleObject
+//        }
+//        return null
+
+        return VehicleObject(10, "AAA1111", "Gol", "Volkswagen", 1, "seg");
+    }
+
+    private fun getParkingSpaceByCar(): ParkedCar? {
+        val parkingSpace = parkingClient.getParkingSpaceByCar(carId).execute()
+
+        if (parkingSpace.code() == 200) {
+
+            return parkingSpace.body()?.let {
+                if (it.isNotEmpty()) {
+                    it[0]
+                } else {
+                    null
+                }
+            }
+
+        }
+        return null
     }
 }

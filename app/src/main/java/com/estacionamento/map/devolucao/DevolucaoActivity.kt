@@ -104,7 +104,7 @@ class DevolucaoActivity : AppCompatActivity() {
     }
 
     private fun confirmCarLocation(){
-        when(viewModel.getSelectedIndex())
+        when(viewModel.getLocationId())
         {
             -1 -> localizacaoInvalida()
             208, 168 -> localizacaoArvore()
@@ -154,16 +154,16 @@ class DevolucaoActivity : AppCompatActivity() {
     }
 
     private fun selectLocation(id: Int){
-        if(viewModel.getSelectedIndex() != -1) {
+        if(viewModel.getLocationId() != -1) {
            changeOldLocation()
         }
         changeCurrentLocation(id)
-        viewModel.setSelectedIndex(id)
+        viewModel.setLocationId(id)
     }
 
     private fun changeOldLocation(){
-        Log.d("debug","changeOldLocation: location - ${viewModel.getSelectedIndex()}")
-        val oldFrameLayout = binding.map.mapGrid[viewModel.getSelectedIndex()] as FrameLayout
+        Log.d("debug","changeOldLocation: location - ${viewModel.getLocationId()}")
+        val oldFrameLayout = binding.map.mapGrid[viewModel.getLocationId()] as FrameLayout
         val oldViewStub = oldFrameLayout[1]
         oldViewStub.visibility = View.INVISIBLE
     }

@@ -3,6 +3,7 @@ package com.estacionamento.home
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.estacionamento.session.SessionManager
 
 class HomeViewModelFactory(
     private val context: Context

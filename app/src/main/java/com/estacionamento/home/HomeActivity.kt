@@ -16,10 +16,12 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: LayoutActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
     private lateinit var viewModelFactory: HomeViewModelFactory
+    private val regex = Regex("[A-Z]{3}[0-9][0-9A-Z][0-9]{2}")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,
+        binding = DataBindingUtil.setContentView(
+            this,
             R.layout.layout_activity_home
         )
         viewModelFactory = HomeViewModelFactory(applicationContext)
@@ -29,31 +31,31 @@ class HomeActivity : AppCompatActivity() {
         viewModel.homeLiveData.observe(this, Observer {
             binding.inputPlacaCarroInterno.text.toString()
         })
-        binding.buttonRetirarCarro.setOnClickListener{
-            viewCar( binding.inputPlacaCarroInterno.text.toString().toUpperCase() )
+        binding.buttonRetirarCarro.setOnClickListener {
+            viewCarToPickup(binding.inputPlacaCarroInterno.text.toString().toUpperCase())
         }
 
-        binding.buttonDevolverCarro.setOnClickListener{
-            sendCar( binding.inputPlacaCarroInterno.text.toString().toUpperCase() )
+        binding.buttonDevolverCarro.setOnClickListener {
+            sendCar(binding.inputPlacaCarroInterno.text.toString().toUpperCase())
         }
-        viewModel.startDb()
+
         viewModel.liveData.observe(this, Observer { viewState ->
             when (viewState) {
                 HomeViewState.LoadingCarInfo -> showLoadingView()
-                is HomeViewState.CarInfoLoadedDevolucao -> sendCarDevolucao()
-                is HomeViewState.CarInfoLoadedRetirada -> sendCarRetirada()
+                is HomeViewState.CarInfoLoadedDevolucao -> sendCarReturn()
+                is HomeViewState.CarInfoLoadedRetirada -> sendCarPickup()
                 is HomeViewState.Error -> showErrorView(viewState.exception)
             }
         })
     }
 
-    private fun showLoadingView(){
+    private fun showLoadingView() {
 
     }
 
-    private fun showErrorView(exception: Exception){
+    private fun showErrorView(exception: Exception) {
         Log.d("debug", "showErrorView: exception - ${exception.message}")
-        val errorMessage: String = when(exception.message){
+        val errorMessage: String = when (exception.message) {
             "carroInvalido" -> "Carro não cadastrado"
             "carroRetirado" -> "Carro já retirado"
             "carroDevolvido" -> "Carro já devolvido"
@@ -63,39 +65,43 @@ class HomeActivity : AppCompatActivity() {
         binding.inputPlacaCarro.error = errorMessage
     }
 
-    private fun sendCarRetirada(){
+    private fun sendCarPickup() {
         val intent = getRetiradaIntent()
         intent.putExtra("carId", viewModel.getCarId())
-        intent.putExtra("localizacao", viewModel.getCarLocation())
-        intent.putExtra("veiculoLocalizacao", viewModel.getVeiculoLocalizacao())
-        Log.d("debug", "sendCarRetirada: carId - ${viewModel.getCarId()} localizacao - ${viewModel.getCarLocation()} veiculoLocalizacao - ${viewModel.getVeiculoLocalizacao()}")
+        intent.putExtra(
+            "carLocation",
+            viewModel.getCarLocation()
+        )
+        intent.putExtra("parkingSpace", viewModel.getParkingSpaceId())
+        Log.d(
+            "debug",
+            "sendCarPickup: carId - ${viewModel.getCarId()} carLocation - ${viewModel.getCarLocation()} parkingSpace - ${viewModel.getParkingSpaceId()}"
+        )
         startActivity(intent)
     }
 
-    private fun sendCarDevolucao(){
-        val intent = getDevolucaoIntent()
+    private fun sendCarReturn() {
+        val intent = getCarReturnIntent()
         intent.putExtra("carId", viewModel.getCarId())
         Log.d("debug", "sendCarDevolucao: carId - ${viewModel.getCarId()}")
         startActivity(intent)
     }
 
-    private fun viewCar(placaCarro: String){
-        if(!validaPlaca(placaCarro))
+    private fun viewCarToPickup(carLicencePlate: String) {
+        if (!validaPlaca(carLicencePlate))
             viewModel.showPlacaInvalidaError()
-        else
-        {
-            viewModel.setPlaca(placaCarro)
-            viewModel.sendCar()
+        else {
+            viewModel.setLicensePlate(carLicencePlate)
+            viewModel.callCarPickup()
         }
     }
 
-    private fun sendCar(placaCarro : String){
-        if(!validaPlaca(placaCarro)){
+    private fun sendCar(placaCarro: String) {
+        if (!validaPlaca(placaCarro)) {
             viewModel.showPlacaInvalidaError()
-        }
-        else{
-            viewModel.setPlaca(placaCarro)
-            viewModel.sendCarDevolucao()
+        } else {
+            viewModel.setLicensePlate(placaCarro)
+            viewModel.carReturn()
         }
     }
 
@@ -105,32 +111,15 @@ class HomeActivity : AppCompatActivity() {
         binding.inputPlacaCarro.error = null
     }
 
-    private fun validaPlaca (placaCarro: String): Boolean {
-
-        //verifica o tamanho da string para saber se o número de caracteres da placa está correto
-        if (placaCarro.length != 7) {
-            return false
-        }
-
-        //verifica se os 3 primeiros caracteres digitados são letras
-        if (!placaCarro.get(0).isLetter() || !placaCarro.get(1).isLetter() || !placaCarro.get(2).isLetter()) {
-            return false
-        }
-
-        //verifica se os quatro últimos caracteres digitados são números
-        if (!placaCarro.get(3).isDigit() || !placaCarro.get(4).isDigit() || !placaCarro.get(5).isDigit() || !placaCarro.get(6).isDigit()) {
-            return false
-        }
-
-        //retorna verdadeiro se perceber que a string tem o formato de uma placa
-        return true
+    private fun validaPlaca(placaCarro: String): Boolean {
+       return regex.matches(placaCarro)
     }
 
-    private fun getDevolucaoIntent() = Intent(DEVOLUCAO_INTENT)
+    private fun getCarReturnIntent() = Intent(DEVOLUCAO_INTENT)
 
     private fun getRetiradaIntent() = Intent(RETIRADA_INTENT)
 
-    companion object{
+    companion object {
         private const val DEVOLUCAO_INTENT = "com.estacionamento.map.devolucao.START"
         private const val RETIRADA_INTENT = "com.estacionamento.map.retirada.START"
     }

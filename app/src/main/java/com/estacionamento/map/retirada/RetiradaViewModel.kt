@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.room.Room
-import com.estacionamento.database.MyDataBase
-import com.estacionamento.map.devolucao.DevolucaoViewState
+import com.estacionamento.api.carrorama.reservation.ReservationClient
+import com.estacionamento.api.parking.park.ParkingClient
+import com.estacionamento.session.SessionManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -17,19 +17,12 @@ class RetiradaViewModel(
 ): ViewModel() {
 
     private val _liveData: MutableLiveData<RetiradaViewState> = MutableLiveData()
-
+    private val reservationClient: ReservationClient = ReservationClient()
+    private val parkingClient: ParkingClient = ParkingClient()
+    private val sessionManager: SessionManager = SessionManager(context)
     private var carId = -1
-
-    private var carLocation = -1
-
-    private var carLocationId = -1
-
-    private val db = Room.databaseBuilder(context, MyDataBase::class.java,"banco")
-        .build()
-
-    private val veiculoLocalizacaoDao = db.getVeiculoLocalizacaoDao()
-    private val veiculoDao = db.getVeiculoDao()
-    private val localizacaoDao = db.getLocalizacaoDao()
+    private var locationId = -1
+    private var parkingSpaceId = -1
 
     val liveData: LiveData<RetiradaViewState>
         get() = _liveData
@@ -42,22 +35,18 @@ class RetiradaViewModel(
         _liveData.value = RetiradaViewState.FinishedMap
     }
 
-    fun mapException(exception: Exception){
-        _liveData.value = RetiradaViewState.Error(exception)
-    }
-
-    fun sendCar() {
+    fun sendCarToPickup() {
         _liveData.value = RetiradaViewState.SendingCar
         try {
             GlobalScope.launch {
-                if(carLocationId == -1)
-                {
+                if (parkingSpaceId == -1) {
                     val exception = Exception("infoError")
                     _liveData.postValue(RetiradaViewState.Error(exception))
-                }
-                else {
-                    veiculoLocalizacaoDao.updateDisponibilidade(carLocationId)
-                    db.close()
+                } else {
+                    if(!deleteParkingSpaceByCar()){
+                        val exception = Exception("infoError")
+                        _liveData.postValue(RetiradaViewState.Error(exception))
+                    }
                     _liveData.postValue(RetiradaViewState.CarSent)
                 }
             }
@@ -75,18 +64,23 @@ class RetiradaViewModel(
         Log.d("debug", "setCarId: index - $carId")
     }
 
-    fun getCarLocation(): Int = carLocation
+    fun getLocationId(): Int = locationId
 
-    fun getCarLocationId(): Int = carLocationId
+    fun getParkingSpace(): Int = parkingSpaceId
 
-    fun setCarLocation(id: Int){
-        carLocation = id
-        Log.d("debug", "setCarLocation: index - $carLocation")
+    fun setLocationId(id: Int){
+        locationId = id
+        Log.d("debug", "setLocationId: index - $locationId")
     }
 
-    fun setCarLocationId(id: Int){
-        carLocationId = id
-        Log.d("debug", "setCarLocationId: index - $carLocation")
+    fun setParkingSpace(id: Int){
+        parkingSpaceId = id
+        Log.d("debug", "setCarLocationId: index - $locationId")
+    }
+
+    private fun deleteParkingSpaceByCar(): Boolean {
+        val parkingSpace = parkingClient.deleteCarInParkingSpace(carId).execute()
+        return parkingSpace.isSuccessful
     }
 
 }
